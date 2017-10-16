@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # OSX
 #
 .DS_Store
@@ -53,6 +54,8 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots
 =======
+=======
+>>>>>>> 4a85905796c912e13648d07b0e245683430f4d3d
 # Logs
 logs
 *.log
@@ -112,4 +115,7 @@ typings/
 # dotenv environment variables file
 .env
 
+<<<<<<< HEAD
+>>>>>>> 4a85905796c912e13648d07b0e245683430f4d3d
+=======
 >>>>>>> 4a85905796c912e13648d07b0e245683430f4d3d
