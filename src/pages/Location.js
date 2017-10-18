@@ -25,11 +25,6 @@ export default class Location extends Component {
 
     componentDidMount() {
         //this.fetchData();
-        this.test();
-    }
-
-    test() {
-        this.setState({ location: 'china' })
     }
 
     fetchData() {
@@ -49,17 +44,19 @@ export default class Location extends Component {
             <View style={styles.container}>
                 <TouchableWithoutFeedback
                     onPress={() => {
+                        storage.save({
+                            key: 'location',
+                            data: '宁波',
+                        });
                         this.props.navigation.dispatch({
-                            key: 'ViewPager',
+                            key: 'Home',
                             type: 'EnterToHome',
-                            routeName: 'ViewPager',
+                            routeName: 'Home',
                             params: {
                                 op: {
-                                    location: '广州',
-                                    weather: '晴',
-                                    temperature: '25',
+                                    location: '宁波'
                                 }
-                            },
+                            }
                         })
                     }}
                 >

@@ -32,6 +32,15 @@ export default class ViewPager extends Component {
             console.log(this.props.navigation.state.params.op);
             this.getParamsFromLocation(this.props.navigation.state.params.op);
         }
+        // setTimeout(() => {
+        //     this.setState({
+        //         op: {
+        //             location: '广州',
+        //             weather: '晴',
+        //             temperature: '25',
+        //         }
+        //     })
+        // }, 5000)
     }
 
     getParamsFromLocation(obj) {
@@ -42,7 +51,9 @@ export default class ViewPager extends Component {
             console.log(this.state.op);
         });
     }
-
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextState.op != this.state.op;
+    }
 
     render() {
         return (

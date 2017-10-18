@@ -3,41 +3,65 @@ import {
     AppRegistry,
     StyleSheet,
     Text,
-    View
+    View,
+    Image,
+    Dimensions
 } from 'react-native';
 import Future from './Future'
 
-var REQUEST_URL = '';
+var REQUEST_URL = 'http://www.sojson.com/open/api/weather/json.shtml?city=';
+const { height, width } = Dimensions.get('window');
 export default class Home extends Component {
 
-    static navigationOptions = {
-        title: '上海青浦',
-    };
+    static navigationOptions = ({ navigation }) => ({
+        title: `${navigation.state.params ? navigation.state.params.op.location : '去定位'}`,
+    });
 
     constructor(props) {
         super(props);
         this.state = {
-            op: {},
+            op: {
+                location: '获取失败',
+                weather: '获取失败',
+                temperature: '获取失败',
+                fx: '',
+                fl: '',
+            },
         };
     }
 
     componentDidMount() {
-        //this.fetchData();
-        this.setState({
-            op: this.props.op,
-        });
+        storage.load({
+            key: 'location',
+            autoSync: true,
+            syncInBackground: true,
+        }).then(ret => {
+            this.fetchData(ret);
+        }).catch(err => {
+            //定位
+            console.warn(err.message);
+            switch (err.name) {
+                case 'NotFoundError':
+                    break;
+                case 'ExpiredError':
+                    break;
+            }
+        })
     }
-    shouldComponentUpdate(nextProps, nextState) {
-        return nextState.op != this.state.op;
-    }
-    fetchData() {
-        fetch(REQUEST_URL)
+
+    fetchData(ret) {
+        fetch(REQUEST_URL + ret)
             .then((response) => response.json())
             .then((responseData) => {
+                console.log(responseData)
                 this.setState({
-                    location: '',
-                    weather: '',
-                    temperature: '',
+                    op: {
+                        location: ret,
+                        weather: responseData.data.forecast[0].type,
+                        temperature: responseData.data.wendu + '℃',
+                        fx: responseData.data.forecast[0].fx,
+                        fl: responseData.data.forecast[0].fl,
+                    }
                 });
             });
     }
@@ -45,15 +69,23 @@ export default class Home extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text style={styles.weather}>
-                    {this.state.op.weather}
-                </Text>
-                <Text style={styles.instructions}>
-                    {this.state.op.temperature}
-                </Text>
-                <Text style={styles.instructions}>
-                    {this.state.op.location}
-                </Text>
+                <View style={styles.pic}>
+                    <Image
+                        style={{ width: width, height: 0.75 * width }}
+                        source={require('../images/rain.jpg')}
+                    />
+                </View>
+                <View style={{ flex: 1, justifyContent: 'center', }}>
+                    <Text style={styles.weather}>
+                        {this.state.op.weather}
+                    </Text>
+                    <Text style={styles.instructions}>
+                        {this.state.op.temperature}
+                    </Text>
+                    <Text style={styles.wind}>
+                        {this.state.op.fx}  {this.state.op.fl}
+                    </Text>
+                </View>
             </View>
         );
     }
@@ -62,19 +94,29 @@ export default class Home extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        // justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F5FCFF',
+        backgroundColor: '#FFFFFF',
+    },
+    pic: {
+        width: width,
+        height: width * 0.75,
     },
     weather: {
-        fontSize: 20,
+        fontSize: 30,
         textAlign: 'center',
-        margin: 10,
     },
     instructions: {
         textAlign: 'center',
+        fontSize: 18,
         color: '#333333',
-        marginBottom: 5,
+        marginTop: 10,
     },
+    wind: {
+        textAlign: 'center',
+        color: '#333333',
+        marginTop: 80,
+        fontSize: 10,
+    }
 });
 
