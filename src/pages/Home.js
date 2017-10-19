@@ -5,7 +5,8 @@ import {
     Text,
     View,
     Image,
-    Dimensions
+    Dimensions,
+    ViewPagerAndroid,
 } from 'react-native';
 import Future from './Future'
 
@@ -31,6 +32,7 @@ export default class Home extends Component {
     }
 
     componentDidMount() {
+        console.log('loading...')
         storage.load({
             key: 'location',
             autoSync: true,
@@ -50,10 +52,12 @@ export default class Home extends Component {
     }
 
     fetchData(ret) {
-        fetch(REQUEST_URL + ret)
+        var url = REQUEST_URL + ret
+        fetch(url)
             .then((response) => response.json())
             .then((responseData) => {
                 console.log(responseData)
+                console.log(url)
                 this.setState({
                     op: {
                         location: ret,
@@ -67,12 +71,13 @@ export default class Home extends Component {
     }
 
     render() {
+        var imgSrc = this.state.op.weather == '晴' ? require('../images/sunny.jpg') : this.state.op.weather.indexOf('雨') !== -1 ? require('../images/rain.jpg') : require('../images/yin.jpg');
         return (
             <View style={styles.container}>
                 <View style={styles.pic}>
                     <Image
                         style={{ width: width, height: 0.75 * width }}
-                        source={require('../images/rain.jpg')}
+                        source={imgSrc}
                     />
                 </View>
                 <View style={{ flex: 1, justifyContent: 'center', }}>
@@ -87,6 +92,7 @@ export default class Home extends Component {
                     </Text>
                 </View>
             </View>
+
         );
     }
 }

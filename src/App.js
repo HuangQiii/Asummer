@@ -78,6 +78,9 @@ export default Asummer = StackNavigator(
         headerMode: 'float',
     }
 );
+
+
+
 const prevGetStateForAction = Asummer.router.getStateForAction;
 Asummer.router.getStateForAction = (action, state) => {
     if (state && action.type === 'ReplaceCurrentScreen') {
@@ -90,7 +93,7 @@ Asummer.router.getStateForAction = (action, state) => {
         };
     }
     if (state && action.type === 'EnterToHome') {
-        const routes = [];
+        var routes = [];
         routes.push(action);
         console.log(routes);
         return {
@@ -98,6 +101,12 @@ Asummer.router.getStateForAction = (action, state) => {
             routes,
             index: routes.length - 1,
         };
+        // NavigationActions.reset({
+        //     index: 0,
+        //     actions: [
+        //         NavigationActions.navigate({ routeName: 'Home' })
+        //     ]
+        // })
     }
     if (state && action.type === 'BcakToCurrentScreen') {
         function findDateInArr(arr, propertyName, value) {
