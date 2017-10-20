@@ -11,8 +11,10 @@ import {
 import { StackNavigator, NavigationActions } from 'react-navigation';
 
 var DATA = [
-    '上海', '宁波', '广州', '福建'
+    '上海', '宁波', '广州', '乌鲁木齐'
 ];
+var DATAPRETEND = ['上海', '宁波', '广州', '乌鲁木齐', '宁海', '海宁', '海南'];
+var DATATEMP = [];
 export default class Location extends Component {
 
     static navigationOptions = {
@@ -28,6 +30,36 @@ export default class Location extends Component {
     }
 
     componentDidMount() {
+        // storage.remove({
+        //     key: 'history',
+        // });
+
+        // start
+        storage.load({
+            key: 'history',
+            autoSync: true,
+            syncInBackground: true,
+        }).then(ret => {
+            console.log(ret)
+            this.setState({
+                dataSource: ret,
+                data: ret,
+            });
+        }).catch(err => {
+            //显示热门
+            this.setState({
+                dataSource: DATA,
+                data: DATA,
+            });
+            switch (err.name) {
+                case 'NotFoundError':
+                    break;
+                case 'ExpiredError':
+                    break;
+            }
+        })
+        // end
+
         this.setState({
             data: DATA,
             dataSource: DATA,
@@ -47,6 +79,34 @@ export default class Location extends Component {
                             key: 'location',
                             data: subject.item,
                         });
+
+                        storage.load({
+                            key: 'history',
+                            autoSync: true,
+                            syncInBackground: true,
+                        }).then(ret => {
+                            DATATEMP = ret;
+                        }).catch(err => {
+                            switch (err.name) {
+                                case 'NotFoundError':
+                                    break;
+                                case 'ExpiredError':
+                                    break;
+                            }
+                        })
+
+                        if (DATATEMP.indexOf(subject.item) == -1) {
+                            DATATEMP.push(subject.item);
+                        }
+
+
+                        console.log(DATATEMP);
+
+                        storage.save({
+                            key: 'history',
+                            data: DATATEMP,
+                        });
+
                         var resetAction = NavigationActions.reset({
                             index: 0,
                             actions: [
@@ -75,13 +135,28 @@ export default class Location extends Component {
         );
     }
 
+    searchAndShow(text) {
+        console.log(text);
+        let oldAry = [...DATAPRETEND];
+        let newAry = [];
+        oldAry.map(function (obj, index, array) {
+            if (obj.indexOf(text) != -1) {
+                newAry.push(obj);
+            }
+        });
+        this.setState({
+            data: newAry,
+            dataSource: newAry,
+        });
+    }
+
     render() {
         return (
             <View style={{ flex: 1 }}>
                 <TextInput
                     style={{ paddingLeft: 20, height: 40, borderColor: 'gray', borderWidth: 1, backgroundColor: 'white', margin: 10, }}
                     onChangeText={(text) => {
-
+                        this.searchAndShow(text);
                     }}
                     value={this.state.text}
                     underlineColorAndroid={'transparent'}
