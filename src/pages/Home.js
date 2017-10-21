@@ -7,10 +7,12 @@ import {
     Image,
     Dimensions,
     ViewPagerAndroid,
-    TouchableHighlight,
+    TouchableWithoutFeedback,
 } from 'react-native';
 import Future from './Future'
+var Geolocation = require('Geolocation');
 
+var REQUEST_URL_LOCATION = 'http://restapi.amap.com/v3/geocode/regeo?';
 var REQUEST_URL = 'http://www.sojson.com/open/api/weather/json.shtml?city=';
 const { height, width } = Dimensions.get('window');
 export default class Home extends Component {
@@ -28,12 +30,13 @@ export default class Home extends Component {
                 temperature: '获取失败',
                 fx: '',
                 fl: '',
+                high: '',
+                low: '',
             },
         };
     }
 
     componentDidMount() {
-        console.log('loading...')
         storage.load({
             key: 'location',
             autoSync: true,
@@ -42,7 +45,7 @@ export default class Home extends Component {
             this.fetchData(ret);
         }).catch(err => {
             //定位
-            console.warn(err.message);
+            this._getLocation();
             switch (err.name) {
                 case 'NotFoundError':
                     break;
@@ -52,13 +55,29 @@ export default class Home extends Component {
         })
     }
 
+    _getLocation() {
+        var that = this;
+        Geolocation.getCurrentPosition(function (data) {
+            that.fetchLocationData('ae3f1758ab976259eb1485a08235bbc6', data.coords.longitude, data.coords.latitude);
+        }, function () {
+            alert('获取位置失败')
+        })
+    }
+
+    fetchLocationData(key, longitude, latitude) {
+        var url = REQUEST_URL_LOCATION + 'output=json&location=' + longitude + ',' + latitude + '&key=' + key;
+        fetch(url)
+            .then((response) => response.json())
+            .then((responseData) => {
+                this.fetchData(responseData.regeocode.addressComponent.province);
+            });
+    }
+
     fetchData(ret) {
         var url = REQUEST_URL + ret
         fetch(url)
             .then((response) => response.json())
             .then((responseData) => {
-                console.log(responseData)
-                console.log(url)
                 this.setState({
                     op: {
                         location: ret,
@@ -66,6 +85,8 @@ export default class Home extends Component {
                         temperature: responseData.data.wendu + '℃',
                         fx: responseData.data.forecast[0].fx,
                         fl: responseData.data.forecast[0].fl,
+                        high: responseData.data.forecast[0].high.slice(3, -3) + '℃',
+                        low: responseData.data.forecast[0].low.slice(3, -3),
                     },
                     dataFromUrl: responseData,
                 });
@@ -88,7 +109,7 @@ export default class Home extends Component {
                         {this.state.op.weather}
                     </Text>
                     <Text style={styles.instructions}>
-                        {this.state.op.temperature}
+                        {this.state.op.low}~{this.state.op.high}
                     </Text>
                     <Text style={styles.wind}>
                         {this.state.op.fx}  {this.state.op.fl}
@@ -100,30 +121,34 @@ export default class Home extends Component {
                     >
                         {this.state.op.location}
                     </Text>
-                    <TouchableHighlight
+                    <TouchableWithoutFeedback
                         onPress={() => {
                             this.props.navigation.navigate('Location')
                         }}
                     >
-                        <Text
-                            style={{ fontSize: 12, color: '#FFFFFF', marginRight: 15 }}
-                        >
-                            定位
+                        <View>
+                            <Text
+                                style={{ fontSize: 12, color: '#FFFFFF', marginRight: 15 }}
+                            >
+                                定位
                         </Text>
-                    </TouchableHighlight>
+                        </View>
+                    </TouchableWithoutFeedback>
                 </View>
                 <View style={{ position: 'absolute', bottom: 10, alignSelf: 'flex-end' }}>
-                    <TouchableHighlight
+                    <TouchableWithoutFeedback
                         onPress={() => {
                             this.props.navigation.navigate('Future', { dataFromUrl: this.state.dataFromUrl })
                         }}
                     >
-                        <Text
-                            style={{ fontSize: 10, color: '#FFFFFF', backgroundColor: 'gray', marginRight: 15, padding: 10, borderRadius: 40 }}
-                        >
-                            预测
+                        <View>
+                            <Text
+                                style={{ fontSize: 10, color: '#FFFFFF', backgroundColor: 'gray', marginRight: 15, padding: 10, borderRadius: 40 }}
+                            >
+                                预测
                         </Text>
-                    </TouchableHighlight>
+                        </View>
+                    </TouchableWithoutFeedback>
                 </View>
             </View>
 

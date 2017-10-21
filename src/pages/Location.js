@@ -9,11 +9,13 @@ import {
     TextInput,
 } from 'react-native';
 import { StackNavigator, NavigationActions } from 'react-navigation';
+var Geolocation = require('Geolocation');
 
+var REQUEST_URL = 'http://restapi.amap.com/v3/geocode/regeo?';
 var DATA = [
-    '上海', '宁波', '广州', '乌鲁木齐'
+    '上海市', '宁波', '广州', '乌鲁木齐'
 ];
-var DATAPRETEND = ['上海', '宁波', '广州', '乌鲁木齐', '宁海', '海宁', '海南'];
+var DATAPRETEND = ['上海市', '宁波', '广州', '乌鲁木齐', '宁海', '海宁', '海南'];
 var DATATEMP = [];
 export default class Location extends Component {
 
@@ -40,7 +42,6 @@ export default class Location extends Component {
             autoSync: true,
             syncInBackground: true,
         }).then(ret => {
-            console.log(ret)
             this.setState({
                 dataSource: ret,
                 data: ret,
@@ -70,7 +71,6 @@ export default class Location extends Component {
 
     _renderItem = (subject) => {
         const { navigate } = this.props.navigation;
-        console.log(subject);
         return (
             <View style={styles.container}>
                 <TouchableWithoutFeedback
@@ -99,9 +99,6 @@ export default class Location extends Component {
                             DATATEMP.push(subject.item);
                         }
 
-
-                        console.log(DATATEMP);
-
                         storage.save({
                             key: 'history',
                             data: DATATEMP,
@@ -110,19 +107,10 @@ export default class Location extends Component {
                         var resetAction = NavigationActions.reset({
                             index: 0,
                             actions: [
-                                NavigationActions.navigate({ routeName: 'Home' })//要跳转到的页面名字
+                                NavigationActions.navigate({ routeName: 'Home' })
                             ]
                         });
-                        {/*this.props.navigation.dispatch({
-                            key: 'Home',
-                            type: 'EnterToHome',
-                            routeName: 'Home',
-                            params: {
-                                op: {
-                                    location: subject.item
-                                }
-                            }
-                        })*/}
+
                         this.props.navigation.dispatch(resetAction);
                     }}
                 >
@@ -136,7 +124,6 @@ export default class Location extends Component {
     }
 
     searchAndShow(text) {
-        console.log(text);
         let oldAry = [...DATAPRETEND];
         let newAry = [];
         oldAry.map(function (obj, index, array) {
@@ -148,6 +135,24 @@ export default class Location extends Component {
             data: newAry,
             dataSource: newAry,
         });
+    }
+
+    _getLocation() {
+        var that = this;
+        Geolocation.getCurrentPosition(function (data) {
+            that.fetchData('ae3f1758ab976259eb1485a08235bbc6', data.coords.longitude, data.coords.latitude);
+        }, function () {
+            alert('获取位置失败')
+        })
+    }
+
+    fetchData(key, longitude, latitude) {
+        var url = REQUEST_URL + 'output=json&location=' + longitude + ',' + latitude + '&key=' + key;
+        fetch(url)
+            .then((response) => response.json())
+            .then((responseData) => {
+                this.searchAndShow(responseData.regeocode.addressComponent.province);
+            });
     }
 
     render() {
@@ -163,13 +168,22 @@ export default class Location extends Component {
                     placeholder={'请输入关键字'}
                 />
                 <View style={{ flex: 1 }}>
+                    <View style={[{ backgroundColor: '#eeeeee' }]}>
+                        <TouchableWithoutFeedback
+                            onPress={() => this._getLocation()}
+                        >
+                            <View>
+                                <Text style={{ fontSize: 18, padding: 10, }}>定位</Text>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+
                     <FlatList
                         keyExtractor={this._keyExtractor}
                         renderItem={this._renderItem}
                         data={this.state.dataSource}>
                     </FlatList>
                 </View>
-
             </View>
         );
     }
