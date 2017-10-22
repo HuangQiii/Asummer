@@ -8,3 +8,5 @@
 10.19 使用reset管理理由，使用FlatList代替ListView
 
 10.21 增加定位功能，根据高德逆地理编码获得城市查询，增加未来几天天气页面
+
+10.22 修复第一次打开因为this.props.navigation.state.params.dataFromUrl.data.forecast为空带来的红屏报错，顺便测试修改
