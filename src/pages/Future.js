@@ -24,8 +24,12 @@ export default class Future extends Component {
     }
 
     componentDidMount() {
+        var op = {};
+        if (!this.props.navigation.state) {
+            op = this.props.navigation.state.params.dataFromUrl.data.forecast;
+        }
         this.setState({
-            op: this.props.navigation.state.params.dataFromUrl.data.forecast,
+            op: op,
         }, () => {
             console.log(this.state.op);
         })
