@@ -6,3 +6,5 @@
 10.18 解决setstate不改变视图的问题，引入react-native-storage管理地理信息，根据地理位置获得天气信息
 
 10.19 使用reset管理理由，使用FlatList代替ListView
+
+10.21 增加定位功能，根据高德逆地理编码获得城市查询，增加未来几天天气页面
