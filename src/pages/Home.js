@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Future from './Future'
 var Geolocation = require('Geolocation');
+var easyGet = require('easy-get');
 
 var REQUEST_URL_LOCATION = 'http://restapi.amap.com/v3/geocode/regeo?';
 var REQUEST_URL = 'http://www.sojson.com/open/api/weather/json.shtml?city=';
@@ -33,6 +34,7 @@ export default class Home extends Component {
                 high: '',
                 low: '',
             },
+            dataFromUrl: '',
         };
     }
 
@@ -78,6 +80,7 @@ export default class Home extends Component {
         fetch(url)
             .then((response) => response.json())
             .then((responseData) => {
+                console.log(responseData)
                 this.setState({
                     op: {
                         location: ret,

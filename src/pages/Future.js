@@ -10,7 +10,7 @@ import {
     TouchableHighlight,
     FlatList,
 } from 'react-native';
-
+var easyGet = require('easy-get');
 
 var REQUEST_URL = 'http://www.sojson.com/open/api/weather/json.shtml?city=';
 const { height, width } = Dimensions.get('window');
@@ -19,14 +19,15 @@ export default class Future extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            op: {},
+            op: [],
         };
     }
 
     componentDidMount() {
-        var op = {};
-        if (!this.props.navigation.state) {
-            op = this.props.navigation.state.params.dataFromUrl.data.forecast;
+        var op = [];
+        op = easyGet.easyGet(this.props.navigation, "state.params.dataFromUrl.data.forecast")
+        if (!op) {
+            op = []
         }
         this.setState({
             op: op,
