@@ -15,7 +15,6 @@ import Storage from 'react-native-storage';
 
 import Home from './pages/Home';
 import Location from './pages/Location';
-import ViewPager from './pages/ViewPager';
 import Future from './pages/Future';
 
 export default Asummer = StackNavigator(
@@ -34,32 +33,7 @@ export default Asummer = StackNavigator(
         },
         Future: {
             screen: Future,
-            navigationOptions: ({ navigation }) => ({
-                header:
-                <View></View>
-                ,
-            }),
         },
-        ViewPager: {
-            screen: ViewPager,
-            navigationOptions: ({ navigation }) => ({
-                headerRight:
-                <View style={{ flexDirection: 'row' }}>
-                    <TouchableHighlight
-                        onPress={() => navigation.navigate('Location')}
-                    >
-                        <Text
-                            style={{ fontSize: 12, color: '#FFFFFF', margin: 20, }}
-                        >
-                            定位
-                </Text>
-                    </TouchableHighlight>
-                </View>
-                ,
-            }),
-        },
-
-
     },
     {
         navigationOptions: ({ navigation }) => ({

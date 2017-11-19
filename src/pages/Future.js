@@ -16,6 +16,10 @@ var REQUEST_URL = 'http://www.sojson.com/open/api/weather/json.shtml?city=';
 const { height, width } = Dimensions.get('window');
 export default class Future extends Component {
 
+    static navigationOptions = {
+        title: '未来天气',
+    };
+
     constructor(props) {
         super(props);
         this.state = {
